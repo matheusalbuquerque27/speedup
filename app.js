@@ -369,6 +369,48 @@ function backToMenu() {
 
 // Inicialização
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('SpeakUp - Sistema de Exercícios carregado!');
-    console.log('⚠️ LEMBRE-SE DE CONFIGURAR A URL DA API no arquivo app.js');
+    console.log('✅ SpeakUp - Sistema de Exercícios carregado!');
+    console.log('📁 Funções disponíveis:', {
+        loadDay: typeof loadDay,
+        backToMenu: typeof backToMenu,
+        submitExercises: typeof submitExercises
+    });
+    
+    // Verificar se os elementos existem
+    const menuScreen = document.getElementById('menu-screen');
+    const exerciseScreen = document.getElementById('exercise-screen');
+    
+    console.log('📄 Elementos encontrados:', {
+        menuScreen: !!menuScreen,
+        exerciseScreen: !!exerciseScreen
+    });
+    
+    // Testar carregamento do JSON
+    console.log('🧪 Testando carregamento do JSON...');
+    fetch('./exercises.json')
+        .then(response => {
+            console.log('📡 Resposta do fetch:', response.status, response.ok);
+            return response.json();
+        })
+        .then(data => {
+            console.log('✅ JSON carregado com sucesso!');
+            console.log('📊 Dias disponíveis:', Object.keys(data));
+            console.log('📝 Exercícios na segunda:', data.monday ? data.monday.length : 'N/A');
+        })
+        .catch(error => {
+            console.error('❌ Erro ao carregar JSON:', error);
+        });
+});
+
+// Disponibilizar funções globalmente (para garantir)
+window.loadDay = loadDay;
+window.backToMenu = backToMenu;
+window.submitExercises = submitExercises;
+window.saveAnswer = saveAnswer;
+window.selectOption = selectOption;
+
+console.log('🌍 Funções exportadas para window:', {
+    loadDay: typeof window.loadDay,
+    backToMenu: typeof window.backToMenu,
+    submitExercises: typeof window.submitExercises
 });

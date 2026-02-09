@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Simples - SpeakUp</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f0f0f0;
+        }
+        .box {
+            background: white;
+            padding: 20px;
+            margin: 10px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+        }
+        button:hover {
+            background: #5568d3;
+        }
+        .log {
+            background: #263238;
+            color: #aed581;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            margin-top: 10px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .success { color: #4caf50; }
+        .error { color: #f44336; }
+        .warning { color: #ff9800; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Teste Simples de Carregamento</h1>
+    
+    <div class="box">
+        <h2>1. Testar Carregamento do JSON</h2>
+        <button onclick="testJSON()">📄 Testar exercises.json</button>
+        <div id="json-result"></div>
+    </div>
+
+    <div class="box">
+        <h2>2. Testar Função loadDay</h2>
+        <button onclick="testLoadDay()">🔧 Testar loadDay('monday')</button>
+        <div id="loadday-result"></div>
+    </div>
+
+    <div class="box">
+        <h2>3. Console de Logs</h2>
+        <div class="log" id="console-log">
+            Aguardando testes...<br>
+        </div>
+    </div>
+
+    <script>
+        // Interceptar console.log
+        const logDiv = document.getElementById('console-log');
+        const originalLog = console.log;
+        const originalError = console.error;
+
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            logDiv.innerHTML += `<span class="success">✓</span> ${args.join(' ')}<br>`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+        };
+
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            logDiv.innerHTML += `<span class="error">✗</span> ${args.join(' ')}<br>`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+        };
+
+        console.warn = function(...args) {
+            logDiv.innerHTML += `<span class="warning">⚠</span> ${args.join(' ')}<br>`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+        };
+
+        // Teste 1: Carregar JSON
+        async function testJSON() {
+            const resultDiv = document.getElementById('json-result');
+            resultDiv.innerHTML = '<p>⏳ Testando...</p>';
+
+            const paths = [
+                './exercises.json',
+                'exercises.json',
+                '/speedup/exercises.json'
+            ];
+
+            let success = false;
+
+            for (const path of paths) {
+                try {
+                    console.log(`Tentando carregar: ${path}`);
+                    const response = await fetch(path);
+                    console.log(`Status: ${response.status} ${response.statusText}`);
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        const days = Object.keys(data);
+                        const totalExercises = days.reduce((sum, day) => sum + (data[day]?.length || 0), 0);
+                        
+                        resultDiv.innerHTML = `
+                            <p class="success">✅ JSON carregado com sucesso!</p>
+                            <p><strong>Caminho:</strong> ${path}</p>
+                            <p><strong>Dias:</strong> ${days.join(', ')}</p>
+                            <p><strong>Total de exercícios:</strong> ${totalExercises}</p>
+                        `;
+                        success = true;
+                        break;
+                    }
+                } catch (error) {
+                    console.error(`Erro em ${path}:`, error.message);
+                }
+            }
+
+            if (!success) {
+                resultDiv.innerHTML = `
+                    <p class="error">❌ Não foi possível carregar o JSON</p>
+                    <p>Tentou em: ${paths.join(', ')}</p>
+                `;
+            }
+        }
+
+        // Teste 2: Testar loadDay
+        async function testLoadDay() {
+            const resultDiv = document.getElementById('loadday-result');
+            resultDiv.innerHTML = '<p>⏳ Testando...</p>';
+
+            try {
+                // Verificar se app.js foi carregado
+                if (typeof loadDay === 'undefined') {
+                    resultDiv.innerHTML = `
+                        <p class="error">❌ Função loadDay não encontrada!</p>
+                        <p>O arquivo app.js não foi carregado ou a função não está disponível.</p>
+                        <p>Carregue esta página através do index.html</p>
+                    `;
+                    return;
+                }
+
+                console.log('Chamando loadDay("monday")...');
+                await loadDay('monday');
+                
+                resultDiv.innerHTML = `
+                    <p class="success">✅ Função loadDay executada!</p>
+                    <p>Verifique o console e a página principal para ver o resultado.</p>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <p class="error">❌ Erro ao executar loadDay</p>
+                    <p><strong>Erro:</strong> ${error.message}</p>
+                `;
+                console.error('Erro em loadDay:', error);
+            }
+        }
+
+        // Auto-teste ao carregar
+        window.addEventListener('DOMContentLoaded', () => {
+            console.log('=== INICIANDO TESTES ===');
+            console.log('URL atual:', window.location.href);
+            console.log('Protocolo:', window.location.protocol);
+            console.log('Host:', window.location.host);
+            console.log('Pathname:', window.location.pathname);
+            
+            // Verificar se app.js está carregado
+            setTimeout(() => {
+                console.log('Verificando app.js...');
+                console.log('loadDay disponível:', typeof loadDay !== 'undefined');
+                console.log('window.loadDay disponível:', typeof window.loadDay !== 'undefined');
+            }, 500);
+        });
+    </script>
+
+    <!-- Carregar app.js se existir -->
+    <script src="app.js" onerror="console.error('❌ app.js não encontrado')"></script>
+</body>
+</html>
