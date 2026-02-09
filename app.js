@@ -4,6 +4,7 @@
 let currentDay = '';
 let currentExercises = [];
 let userAnswers = {};
+let originalMenuHTML = ''; // Armazenar HTML original do menu
 
 // URL da API - VOCÊ DEVE SUBSTITUIR PELA SUA API
 const API_URL = 'https://script.google.com/macros/s/AKfycbzaWH3Z7zyfSTVtyTlNKmJvCCNMWTpD379nQ2EJ6hEef8elI1HWr9jOjjufJ-_x_ibE/exec';
@@ -64,10 +65,14 @@ async function loadDay(day) {
         console.warn('⚠️ Elementos de interface não encontrados. Carregando apenas dados...');
     }
     
+    // Salvar HTML original do menu (se ainda não salvou)
+    if (menuScreen && !originalMenuHTML) {
+        originalMenuHTML = menuScreen.innerHTML;
+        console.log('💾 HTML original do menu salvo');
+    }
+    
     // Mostrar loading (se interface existir)
-    let originalContent = '';
     if (menuScreen) {
-        originalContent = menuScreen.innerHTML;
         menuScreen.innerHTML = `
             <div style="text-align: center; padding: 60px 20px;">
                 <div style="font-size: 3em; margin-bottom: 20px;">⏳</div>
@@ -81,12 +86,12 @@ async function loadDay(day) {
     const allExercises = await loadExercises();
     
     if (!allExercises) {
-        if (menuScreen) menuScreen.innerHTML = originalContent;
+        if (menuScreen && originalMenuHTML) menuScreen.innerHTML = originalMenuHTML;
         return; // Erro já foi mostrado em loadExercises
     }
     
     if (!allExercises[day]) {
-        if (menuScreen) menuScreen.innerHTML = originalContent;
+        if (menuScreen && originalMenuHTML) menuScreen.innerHTML = originalMenuHTML;
         alert('❌ Exercícios do dia "' + dayNames[day] + '" não encontrados!');
         return;
     }
@@ -396,6 +401,12 @@ function backToMenu() {
 
     const exerciseScreen = document.getElementById('exercise-screen');
     const menuScreen = document.getElementById('menu-screen');
+    
+    // Restaurar HTML original do menu
+    if (menuScreen && originalMenuHTML) {
+        menuScreen.innerHTML = originalMenuHTML;
+        console.log('🔄 HTML do menu restaurado');
+    }
     
     exerciseScreen.classList.add('hidden');
     exerciseScreen.style.display = 'none';
