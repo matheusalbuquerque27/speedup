@@ -6,7 +6,7 @@ let currentExercises = [];
 let userAnswers = {};
 
 // URL da API - VOCÊ DEVE SUBSTITUIR PELA SUA API
-const API_URL = 'https://script.google.com/macros/s/AKfycbzR-sxik9fePT8kIhpjRkS70cQafYjVaXyH73mdUkfLlY7Hcbi5A4QQpWonUU7WdWGG/exec'; // ⚠️ ALTERE AQUI
+const API_URL = 'https://script.google.com/macros/s/AKfycbzaWH3Z7zyfSTVtyTlNKmJvCCNMWTpD379nQ2EJ6hEef8elI1HWr9jOjjufJ-_x_ibE/exec';
 
 // Mapeamento de nomes dos dias
 const dayNames = {
