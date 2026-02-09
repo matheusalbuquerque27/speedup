@@ -54,27 +54,39 @@ async function loadExercises() {
 
 // Carregar exercícios do dia
 async function loadDay(day) {
-    // Mostrar loading
+    console.log(`🔵 loadDay('${day}') chamado`);
+    
+    // Verificar se os elementos da interface existem
     const menuScreen = document.getElementById('menu-screen');
-    const originalContent = menuScreen.innerHTML;
-    menuScreen.innerHTML = `
-        <div style="text-align: center; padding: 60px 20px;">
-            <div style="font-size: 3em; margin-bottom: 20px;">⏳</div>
-            <h2 style="color: #333;">Carregando exercícios...</h2>
-            <p style="color: #666;">Por favor, aguarde</p>
-        </div>
-    `;
+    const exerciseScreen = document.getElementById('exercise-screen');
+    
+    if (!menuScreen || !exerciseScreen) {
+        console.warn('⚠️ Elementos de interface não encontrados. Carregando apenas dados...');
+    }
+    
+    // Mostrar loading (se interface existir)
+    let originalContent = '';
+    if (menuScreen) {
+        originalContent = menuScreen.innerHTML;
+        menuScreen.innerHTML = `
+            <div style="text-align: center; padding: 60px 20px;">
+                <div style="font-size: 3em; margin-bottom: 20px;">⏳</div>
+                <h2 style="color: #333;">Carregando exercícios...</h2>
+                <p style="color: #666;">Por favor, aguarde</p>
+            </div>
+        `;
+    }
     
     currentDay = day;
     const allExercises = await loadExercises();
     
     if (!allExercises) {
-        menuScreen.innerHTML = originalContent;
+        if (menuScreen) menuScreen.innerHTML = originalContent;
         return; // Erro já foi mostrado em loadExercises
     }
     
     if (!allExercises[day]) {
-        menuScreen.innerHTML = originalContent;
+        if (menuScreen) menuScreen.innerHTML = originalContent;
         alert('❌ Exercícios do dia "' + dayNames[day] + '" não encontrados!');
         return;
     }
@@ -82,14 +94,23 @@ async function loadDay(day) {
     currentExercises = allExercises[day];
     userAnswers = {};
 
-    // Atualizar interface
-    document.getElementById('menu-screen').classList.add('hidden');
-    document.getElementById('exercise-screen').classList.remove('hidden');
-    document.getElementById('current-day-name').textContent = dayNames[day];
-    document.getElementById('total-exercises').textContent = currentExercises.length;
+    console.log(`✅ ${currentExercises.length} exercícios carregados para ${dayNames[day]}`);
 
-    renderExercises();
-}
+    // Atualizar interface (apenas se elementos existirem)
+    if (menuScreen && exerciseScreen) {
+        menuScreen.classList.add('hidden');
+        exerciseScreen.classList.remove('hidden');
+        
+        const dayNameElement = document.getElementById('current-day-name');
+        const totalExercisesElement = document.getElementById('total-exercises');
+        
+        if (dayNameElement) dayNameElement.textContent = dayNames[day];
+        if (totalExercisesElement) totalExercisesElement.textContent = currentExercises.length;
+
+        renderExercises();
+    } else {
+        console.log('✅ Exercícios carregados (modo teste - sem interface)');
+    }
 
 // Renderizar exercícios
 function renderExercises() {
