@@ -164,7 +164,7 @@ function renderExercises() {
                         ${exercise.options.map((option, optIndex) => `
                             <button 
                                 class="option-button" 
-                                onclick="selectOption(${index}, ${optIndex}, '${option}')"
+                                onclick="selectOption(${index}, ${optIndex}, \`${option}\`)"
                                 id="option-${index}-${optIndex}"
                             >
                                 ${String.fromCharCode(65 + optIndex)}) ${option}
@@ -311,7 +311,7 @@ async function submitExercises() {
         const response = await fetch(API_URL, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
+                'Content-Type': 'text/plain',
             },
             body: JSON.stringify(apiData)
         });
