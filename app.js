@@ -98,16 +98,30 @@ async function loadDay(day) {
 
     // Atualizar interface (apenas se elementos existirem)
     if (menuScreen && exerciseScreen) {
+        console.log('🎨 Atualizando interface...');
+        console.log('Menu screen classes antes:', menuScreen.className);
+        console.log('Exercise screen classes antes:', exerciseScreen.className);
+        
         menuScreen.classList.add('hidden');
         exerciseScreen.classList.remove('hidden');
+        
+        console.log('Menu screen classes depois:', menuScreen.className);
+        console.log('Exercise screen classes depois:', exerciseScreen.className);
         
         const dayNameElement = document.getElementById('current-day-name');
         const totalExercisesElement = document.getElementById('total-exercises');
         
+        console.log('Elementos encontrados:', {
+            dayNameElement: !!dayNameElement,
+            totalExercisesElement: !!totalExercisesElement
+        });
+        
         if (dayNameElement) dayNameElement.textContent = dayNames[day];
         if (totalExercisesElement) totalExercisesElement.textContent = currentExercises.length;
 
+        console.log('🎯 Chamando renderExercises()...');
         renderExercises();
+        console.log('✅ renderExercises() concluído');
     } else {
         console.log('✅ Exercícios carregados (modo teste - sem interface)');
     }
