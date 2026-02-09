@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste de Envio - API</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: #252526;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+        }
+        h1 {
+            color: #4ec9b0;
+            border-bottom: 2px solid #4ec9b0;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #569cd6;
+            margin-top: 30px;
+        }
+        .info-box {
+            background: #1e1e1e;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            border-left: 4px solid #4ec9b0;
+        }
+        .api-url {
+            background: #1e1e1e;
+            padding: 10px;
+            border-radius: 5px;
+            color: #ce9178;
+            word-break: break-all;
+        }
+        button {
+            background: #0e639c;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 10px 10px 0;
+            transition: all 0.3s;
+        }
+        button:hover {
+            background: #1177bb;
+            transform: translateY(-2px);
+        }
+        button:active {
+            transform: translateY(0);
+        }
+        pre {
+            background: #1e1e1e;
+            padding: 20px;
+            border-radius: 5px;
+            overflow-x: auto;
+            border: 1px solid #3c3c3c;
+        }
+        .json {
+            color: #ce9178;
+        }
+        .key {
+            color: #9cdcfe;
+        }
+        .string {
+            color: #ce9178;
+        }
+        .number {
+            color: #b5cea8;
+        }
+        .boolean {
+            color: #569cd6;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        .success {
+            background: #1e3a1e;
+            border: 2px solid #4ec9b0;
+            color: #4ec9b0;
+        }
+        .error {
+            background: #3a1e1e;
+            border: 2px solid #f48771;
+            color: #f48771;
+        }
+        .label {
+            display: inline-block;
+            background: #0e639c;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Teste de Envio para API</h1>
+        
+        <div class="info-box">
+            <p><span class="label">INFO</span> Esta página simula o envio de dados do sistema de exercícios para sua API.</p>
+        </div>
+
+        <h2>📡 URL da API</h2>
+        <div class="api-url" id="apiUrl">Carregando...</div>
+
+        <h2>📦 Dados que serão enviados</h2>
+        <pre id="jsonData"></pre>
+
+        <h2>🚀 Ações</h2>
+        <button onclick="sendTestData()">📤 Enviar Dados de Teste</button>
+        <button onclick="copyToClipboard()">📋 Copiar JSON</button>
+        <button onclick="location.reload()">🔄 Resetar</button>
+
+        <div id="result"></div>
+
+        <h2>📊 Estrutura dos Dados</h2>
+        <div class="info-box">
+            <p><strong>timestamp:</strong> Data/hora do envio (ISO 8601)</p>
+            <p><strong>student:</strong> Nome do estudante</p>
+            <p><strong>worksheetId:</strong> ID da planilha (formato: dia_licao_nivel)</p>
+            <p><strong>total:</strong> Total de exercícios</p>
+            <p><strong>correct:</strong> Número de acertos</p>
+            <p><strong>payload:</strong> Array com todos os exercícios e respostas</p>
+        </div>
+
+        <h2>📝 Formato do worksheetId</h2>
+        <div class="info-box">
+            <pre style="margin: 0;">
+Formato: {dia}_{licao}_{nivel}
+
+Exemplos:
+• monday_lesson01_seed
+• tuesday_lesson01_seed
+• wednesday_lesson01_seed
+• thursday_lesson01_seed
+• friday_lesson01_seed
+            </pre>
+        </div>
+    </div>
+
+    <script>
+        // Dados de teste
+        const testData = {
+            timestamp: new Date().toISOString(),
+            student: "Teste Usuário",
+            worksheetId: "monday_lesson01_seed",
+            total: 3,
+            correct: 2,
+            payload: [
+                {
+                    exerciseNumber: 1,
+                    type: "multiple-choice",
+                    question: "Como se diz 'Olá' em inglês?",
+                    correctAnswer: "Hello",
+                    userAnswer: "Hello",
+                    isCorrect: true
+                },
+                {
+                    exerciseNumber: 2,
+                    type: "fill-blank",
+                    question: "Complete: 'Good _____' (Bom dia)",
+                    correctAnswer: "morning",
+                    userAnswer: "morning",
+                    isCorrect: true
+                },
+                {
+                    exerciseNumber: 3,
+                    type: "translate",
+                    question: "Traduza para inglês: 'Qual é seu nome?'",
+                    correctAnswer: "what's your name",
+                    userAnswer: "what is name",
+                    isCorrect: false
+                }
+            ]
+        };
+
+        // Carregar URL da API do app.js
+        async function loadApiUrl() {
+            try {
+                const response = await fetch('app.js');
+                const text = await response.text();
+                const match = text.match(/const API_URL = '([^']+)'/);
+                if (match) {
+                    document.getElementById('apiUrl').textContent = match[1];
+                    return match[1];
+                } else {
+                    document.getElementById('apiUrl').textContent = 'URL não encontrada no app.js';
+                    return null;
+                }
+            } catch (error) {
+                document.getElementById('apiUrl').textContent = 'Erro ao carregar app.js';
+                return null;
+            }
+        }
+
+        // Exibir JSON formatado
+        function displayJson() {
+            const jsonStr = JSON.stringify(testData, null, 2);
+            document.getElementById('jsonData').textContent = jsonStr;
+        }
+
+        // Enviar dados de teste
+        async function sendTestData() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '<p>⏳ Enviando dados...</p>';
+            resultDiv.className = '';
+
+            const apiUrl = document.getElementById('apiUrl').textContent;
+
+            if (!apiUrl || apiUrl.includes('não encontrada') || apiUrl.includes('Erro')) {
+                resultDiv.innerHTML = '<p>❌ Configure a URL da API em app.js primeiro!</p>';
+                resultDiv.className = 'error';
+                return;
+            }
+
+            try {
+                console.log('Enviando para:', apiUrl);
+                console.log('Dados:', testData);
+
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(testData)
+                });
+
+                console.log('Status:', response.status);
+                console.log('Headers:', Object.fromEntries(response.headers.entries()));
+
+                let responseData;
+                const contentType = response.headers.get('content-type');
+                
+                if (contentType && contentType.includes('application/json')) {
+                    responseData = await response.json();
+                } else {
+                    responseData = await response.text();
+                }
+
+                console.log('Resposta:', responseData);
+
+                if (response.ok) {
+                    resultDiv.innerHTML = `
+                        <p><strong>✅ Sucesso!</strong></p>
+                        <p><strong>Status:</strong> ${response.status} ${response.statusText}</p>
+                        <p><strong>Resposta:</strong></p>
+                        <pre>${JSON.stringify(responseData, null, 2)}</pre>
+                    `;
+                    resultDiv.className = 'success';
+                } else {
+                    throw new Error(`Erro ${response.status}: ${response.statusText}`);
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                resultDiv.innerHTML = `
+                    <p><strong>❌ Erro ao enviar!</strong></p>
+                    <p><strong>Mensagem:</strong> ${error.message}</p>
+                    <p><strong>Dica:</strong> Verifique o console (F12) para mais detalhes</p>
+                    <p style="margin-top: 10px; font-size: 12px;">
+                        <strong>Possíveis causas:</strong><br>
+                        • URL da API incorreta<br>
+                        • API fora do ar<br>
+                        • Problema de CORS<br>
+                        • Sem conexão com internet
+                    </p>
+                `;
+                resultDiv.className = 'error';
+            }
+        }
+
+        // Copiar JSON para clipboard
+        function copyToClipboard() {
+            const jsonStr = JSON.stringify(testData, null, 2);
+            navigator.clipboard.writeText(jsonStr).then(() => {
+                alert('✅ JSON copiado para a área de transferência!');
+            }).catch(err => {
+                console.error('Erro ao copiar:', err);
+                alert('❌ Erro ao copiar. Veja o console.');
+            });
+        }
+
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', () => {
+            loadApiUrl();
+            displayJson();
+        });
+    </script>
+</body>
+</html>

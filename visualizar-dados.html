@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste - Visualizar Dados Salvos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        button.danger {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        }
+
+        .submissions-list {
+            margin-top: 30px;
+        }
+
+        .submission-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 5px solid #667eea;
+        }
+
+        .submission-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .submission-info {
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .score {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .score.good {
+            color: #27ae60;
+        }
+
+        .score.medium {
+            color: #f39c12;
+        }
+
+        .score.bad {
+            color: #e74c3c;
+        }
+
+        .exercises-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(30px, 1fr));
+            gap: 5px;
+            margin-top: 15px;
+        }
+
+        .exercise-dot {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8em;
+            font-weight: bold;
+            color: white;
+        }
+
+        .exercise-dot.correct {
+            background: #27ae60;
+        }
+
+        .exercise-dot.incorrect {
+            background: #e74c3c;
+        }
+
+        .details-button {
+            background: #3498db;
+            padding: 8px 15px;
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+
+        .exercise-details {
+            display: none;
+            margin-top: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .exercise-details.show {
+            display: block;
+        }
+
+        .exercise-item {
+            padding: 10px;
+            margin-bottom: 10px;
+            border-left: 3px solid #ddd;
+            padding-left: 15px;
+        }
+
+        .exercise-item.correct {
+            border-left-color: #27ae60;
+            background: #d4edda;
+        }
+
+        .exercise-item.incorrect {
+            border-left-color: #e74c3c;
+            background: #f8d7da;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+
+        .empty-state-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .content {
+                padding: 20px;
+            }
+
+            .submission-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .exercises-summary {
+                grid-template-columns: repeat(10, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📊 Visualizar Dados Salvos</h1>
+            <p>Sistema de Exercícios - SpeakUp</p>
+        </header>
+
+        <div class="content">
+            <div class="button-group">
+                <button onclick="loadSubmissions()">🔄 Atualizar Dados</button>
+                <button onclick="exportData()">📥 Exportar JSON</button>
+                <button onclick="clearData()" class="danger">🗑️ Limpar Tudo</button>
+            </div>
+
+            <div class="stats" id="stats"></div>
+
+            <div class="submissions-list" id="submissions"></div>
+        </div>
+    </div>
+
+    <script>
+        function loadSubmissions() {
+            const submissions = [];
+            
+            // Buscar todos os dados do localStorage
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key.startsWith('speakup_')) {
+                    try {
+                        const data = JSON.parse(localStorage.getItem(key));
+                        submissions.push({ key, data });
+                    } catch (e) {
+                        console.error('Erro ao ler:', key, e);
+                    }
+                }
+            }
+
+            // Ordenar por data (mais recente primeiro)
+            submissions.sort((a, b) => 
+                new Date(b.data.timestamp) - new Date(a.data.timestamp)
+            );
+
+            displayStats(submissions);
+            displaySubmissions(submissions);
+        }
+
+        function displayStats(submissions) {
+            const statsDiv = document.getElementById('stats');
+            
+            if (submissions.length === 0) {
+                statsDiv.innerHTML = '';
+                return;
+            }
+
+            const totalSubmissions = submissions.length;
+            const totalExercises = submissions.reduce((sum, s) => sum + s.data.score.total, 0);
+            const totalCorrect = submissions.reduce((sum, s) => sum + s.data.score.correct, 0);
+            const avgScore = Math.round((totalCorrect / totalExercises) * 100);
+
+            statsDiv.innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-value">${totalSubmissions}</div>
+                    <div class="stat-label">Envios Totais</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${totalExercises}</div>
+                    <div class="stat-label">Exercícios Feitos</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${totalCorrect}</div>
+                    <div class="stat-label">Acertos</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${avgScore}%</div>
+                    <div class="stat-label">Média Geral</div>
+                </div>
+            `;
+        }
+
+        function displaySubmissions(submissions) {
+            const container = document.getElementById('submissions');
+            
+            if (submissions.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📭</div>
+                        <h2>Nenhum dado encontrado</h2>
+                        <p>Faça alguns exercícios primeiro!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = submissions.map((sub, index) => {
+                const { data, key } = sub;
+                const percentage = data.score.percentage;
+                const scoreClass = percentage >= 70 ? 'good' : percentage >= 50 ? 'medium' : 'bad';
+                const date = new Date(data.timestamp);
+
+                return `
+                    <div class="submission-card">
+                        <div class="submission-header">
+                            <div>
+                                <h3>👤 ${data.studentName}</h3>
+                                <div class="submission-info">
+                                    📅 ${date.toLocaleDateString('pt-BR')} às ${date.toLocaleTimeString('pt-BR')}
+                                    <br>
+                                    📚 ${data.dayName} | ${data.lesson}
+                                </div>
+                            </div>
+                            <div class="score ${scoreClass}">
+                                ${data.score.correct}/${data.score.total}
+                                <br>
+                                <span style="font-size: 0.7em">(${percentage}%)</span>
+                            </div>
+                        </div>
+
+                        <div class="exercises-summary">
+                            ${data.exercises.map((ex, i) => `
+                                <div class="exercise-dot ${ex.isCorrect ? 'correct' : 'incorrect'}"
+                                     title="Exercício ${i + 1}: ${ex.isCorrect ? 'Correto' : 'Incorreto'}">
+                                    ${i + 1}
+                                </div>
+                            `).join('')}
+                        </div>
+
+                        <button class="details-button" onclick="toggleDetails(${index})">
+                            📋 Ver Detalhes
+                        </button>
+
+                        <div class="exercise-details" id="details-${index}">
+                            ${data.exercises.map((ex, i) => `
+                                <div class="exercise-item ${ex.isCorrect ? 'correct' : 'incorrect'}">
+                                    <strong>Exercício ${ex.exerciseNumber}</strong> [${ex.type}]
+                                    <br>
+                                    <em>${ex.question}</em>
+                                    <br>
+                                    ✅ Resposta correta: <strong>${ex.correctAnswer}</strong>
+                                    <br>
+                                    ${ex.isCorrect ? '✔️' : '❌'} Sua resposta: <strong>${ex.userAnswer}</strong>
+                                </div>
+                            `).join('')}
+                            
+                            <button class="details-button danger" onclick="deleteSubmission('${key}')">
+                                🗑️ Deletar este envio
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function toggleDetails(index) {
+            const details = document.getElementById(`details-${index}`);
+            details.classList.toggle('show');
+        }
+
+        function exportData() {
+            const submissions = [];
+            
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key.startsWith('speakup_')) {
+                    try {
+                        const data = JSON.parse(localStorage.getItem(key));
+                        submissions.push(data);
+                    } catch (e) {
+                        console.error('Erro ao ler:', key, e);
+                    }
+                }
+            }
+
+            if (submissions.length === 0) {
+                alert('Nenhum dado para exportar!');
+                return;
+            }
+
+            const dataStr = JSON.stringify(submissions, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `speakup_exercises_${Date.now()}.json`;
+            link.click();
+            
+            URL.revokeObjectURL(url);
+            alert('Dados exportados com sucesso!');
+        }
+
+        function deleteSubmission(key) {
+            if (confirm('Tem certeza que deseja deletar este envio?')) {
+                localStorage.removeItem(key);
+                loadSubmissions();
+                alert('Envio deletado!');
+            }
+        }
+
+        function clearData() {
+            if (confirm('⚠️ ATENÇÃO: Isso irá apagar TODOS os dados salvos. Deseja continuar?')) {
+                if (confirm('Tem CERTEZA ABSOLUTA? Esta ação não pode ser desfeita!')) {
+                    const keys = [];
+                    for (let i = 0; i < localStorage.length; i++) {
+                        const key = localStorage.key(i);
+                        if (key.startsWith('speakup_')) {
+                            keys.push(key);
+                        }
+                    }
+                    
+                    keys.forEach(key => localStorage.removeItem(key));
+                    loadSubmissions();
+                    alert('Todos os dados foram apagados!');
+                }
+            }
+        }
+
+        // Carregar dados ao abrir a página
+        document.addEventListener('DOMContentLoaded', loadSubmissions);
+    </script>
+</body>
+</html>
