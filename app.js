@@ -568,11 +568,13 @@ console.log('🌍 Funções exportadas para window:', {
 // Função para mostrar a tela de vídeos
 function showVideos() {
     console.log('🎥 Abrindo tela de vídeos...');
+    console.log('📊 Nível atual:', currentLevel);
     
     const menuScreen = document.getElementById('menu-screen');
     const videosScreen = document.getElementById('videos-screen');
+    const videosContainer = document.getElementById('videos-container');
     
-    if (!menuScreen || !videosScreen) {
+    if (!menuScreen || !videosScreen || !videosContainer) {
         console.error('❌ Elementos da interface não encontrados');
         return;
     }
@@ -583,6 +585,52 @@ function showVideos() {
         console.log('💾 HTML original do menu salvo');
     }
     
+    // Limpar container de vídeos
+    videosContainer.innerHTML = '';
+    
+    // Definir vídeos baseado no nível
+    let videos = [];
+    
+    if (currentLevel === 'seed') {
+        videos = [
+            { title: '📚 Seed - Lesson 01', url: 'https://www.youtube.com/embed/bmWPdq6jw3Q' },
+            { title: '📚 Seed - Lesson 02', url: 'https://www.youtube.com/embed/Sp_9i-j3Ryw' }
+        ];
+    } else if (currentLevel === 'root') {
+        // Aqui você pode adicionar vídeos do Root no futuro
+        videos = [
+            // Exemplo: { title: '📚 Root - Lesson 01', url: 'https://www.youtube.com/embed/ID_VIDEO' }
+        ];
+    }
+    
+    // Verificar se há vídeos disponíveis
+    if (videos.length === 0) {
+        videosContainer.innerHTML = `
+            <div style="text-align: center; padding: 40px; color: #666;">
+                <h3>🎬 Em Breve!</h3>
+                <p>As aulas gravadas para o nível ${currentLevel.toUpperCase()} estarão disponíveis em breve.</p>
+            </div>
+        `;
+    } else {
+        // Criar cards de vídeo
+        videos.forEach(video => {
+            const videoCard = document.createElement('div');
+            videoCard.className = 'video-card';
+            videoCard.innerHTML = `
+                <h3 class="video-title">${video.title}</h3>
+                <div class="video-wrapper">
+                    <iframe 
+                        src="${video.url}" 
+                        frameborder="0" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                        allowfullscreen>
+                    </iframe>
+                </div>
+            `;
+            videosContainer.appendChild(videoCard);
+        });
+    }
+    
     // Esconder menu e mostrar vídeos
     menuScreen.classList.add('hidden');
     menuScreen.style.display = 'none';
@@ -590,7 +638,7 @@ function showVideos() {
     videosScreen.classList.remove('hidden');
     videosScreen.style.display = 'block';
     
-    console.log('✅ Tela de vídeos exibida');
+    console.log(`✅ Tela de vídeos exibida para nível: ${currentLevel}`);
 }
 
 // Função para voltar ao menu a partir da tela de vídeos
