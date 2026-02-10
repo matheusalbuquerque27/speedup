@@ -554,9 +554,69 @@ window.backToMenu = backToMenu;
 window.submitExercises = submitExercises;
 window.saveAnswer = saveAnswer;
 window.selectOption = selectOption;
+window.showVideos = showVideos;
+window.backToMenuFromVideos = backToMenuFromVideos;
 
 console.log('🌍 Funções exportadas para window:', {
     loadDay: typeof window.loadDay,
     backToMenu: typeof window.backToMenu,
-    submitExercises: typeof window.submitExercises
+    submitExercises: typeof window.submitExercises,
+    showVideos: typeof window.showVideos,
+    backToMenuFromVideos: typeof window.backToMenuFromVideos
 });
+
+// Função para mostrar a tela de vídeos
+function showVideos() {
+    console.log('🎥 Abrindo tela de vídeos...');
+    
+    const menuScreen = document.getElementById('menu-screen');
+    const videosScreen = document.getElementById('videos-screen');
+    
+    if (!menuScreen || !videosScreen) {
+        console.error('❌ Elementos da interface não encontrados');
+        return;
+    }
+    
+    // Salvar HTML original do menu (se ainda não salvou)
+    if (!originalMenuHTML) {
+        originalMenuHTML = menuScreen.innerHTML;
+        console.log('💾 HTML original do menu salvo');
+    }
+    
+    // Esconder menu e mostrar vídeos
+    menuScreen.classList.add('hidden');
+    menuScreen.style.display = 'none';
+    
+    videosScreen.classList.remove('hidden');
+    videosScreen.style.display = 'block';
+    
+    console.log('✅ Tela de vídeos exibida');
+}
+
+// Função para voltar ao menu a partir da tela de vídeos
+function backToMenuFromVideos() {
+    console.log('🔙 Voltando ao menu...');
+    
+    const videosScreen = document.getElementById('videos-screen');
+    const menuScreen = document.getElementById('menu-screen');
+    
+    if (!videosScreen || !menuScreen) {
+        console.error('❌ Elementos da interface não encontrados');
+        return;
+    }
+    
+    // Restaurar HTML original do menu
+    if (originalMenuHTML) {
+        menuScreen.innerHTML = originalMenuHTML;
+        console.log('🔄 HTML do menu restaurado');
+    }
+    
+    // Esconder vídeos e mostrar menu
+    videosScreen.classList.add('hidden');
+    videosScreen.style.display = 'none';
+    
+    menuScreen.classList.remove('hidden');
+    menuScreen.style.display = 'block';
+    
+    console.log('✅ Menu exibido');
+}
