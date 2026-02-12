@@ -599,8 +599,8 @@ function showVideos() {
     } else if (currentLevel === 'root') {
         // Aqui você pode adicionar vídeos do Root no futuro
         videos = [
-            { title: '📚 Root - Lesson 01', url: 'https://youtu.be/6DArC_SJ7Uw' },
-            { title: '📚 Root - Lesson 02', url: 'https://youtu.be/4zqE4uznWxk' }
+            { title: '📚 Root - Lesson 01', url: 'https://www.youtube.com/embed/6DArC_SJ7Uw?si=C2ASh0RrQu2GWE-8' },
+            { title: '📚 Root - Lesson 02', url: 'https://www.youtube.com/embed/4zqE4uznWxk?si=8JaDLu53E_ju0aa0' }
         ];
     }
     
