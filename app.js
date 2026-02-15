@@ -669,3 +669,237 @@ function backToMenuFromVideos() {
     
     console.log('✅ Menu exibido');
 }
+
+// ===== FUNÇÕES DE PODCASTS =====
+
+// Lista de podcasts disponíveis
+const podcastsList = [
+    {
+        id: 1,
+        title: 'Episode 01 - Travel & Trips',
+        description: 'Listen to Alex and Sam talking about their travel experiences and vacation plans.',
+        audioFile: 'aulas/Root/Podcasts/podcast_episode01.wav',
+        scriptFile: 'aulas/Root/Podcasts/podcast_audioscript.md',
+        duration: '5:00'
+    }
+    // Adicione mais podcasts aqui conforme necessário
+];
+
+let currentPodcast = null;
+
+// Função para mostrar a lista de podcasts
+function showPodcasts() {
+    console.log('🎙️ Abrindo lista de podcasts...');
+    
+    const menuScreen = document.getElementById('menu-screen');
+    const podcastsScreen = document.getElementById('podcasts-screen');
+    const podcastsContainer = document.getElementById('podcasts-container');
+    
+    if (!menuScreen || !podcastsScreen || !podcastsContainer) {
+        console.error('❌ Elementos da interface não encontrados');
+        return;
+    }
+    
+    // Salvar HTML original do menu
+    if (!originalMenuHTML) {
+        originalMenuHTML = menuScreen.innerHTML;
+    }
+    
+    // Limpar container
+    podcastsContainer.innerHTML = '';
+    
+    // Criar cards de podcasts
+    podcastsList.forEach(podcast => {
+        const podcastCard = document.createElement('div');
+        podcastCard.className = 'podcast-card';
+        podcastCard.onclick = () => openPodcast(podcast);
+        podcastCard.innerHTML = `
+            <h3><i class="fas fa-podcast"></i> ${podcast.title}</h3>
+            <p>${podcast.description}</p>
+            <p style="margin-top: 15px; color: #667eea; font-weight: bold;">
+                <i class="fas fa-clock"></i> Duration: ${podcast.duration}
+            </p>
+        `;
+        podcastsContainer.appendChild(podcastCard);
+    });
+    
+    // Esconder menu e mostrar podcasts
+    menuScreen.classList.add('hidden');
+    menuScreen.style.display = 'none';
+    
+    podcastsScreen.classList.remove('hidden');
+    podcastsScreen.style.display = 'block';
+    
+    console.log('✅ Lista de podcasts exibida');
+}
+
+// Função para voltar ao menu a partir da lista de podcasts
+function backToMenuFromPodcasts() {
+    console.log('🔙 Voltando ao menu...');
+    
+    const podcastsScreen = document.getElementById('podcasts-screen');
+    const menuScreen = document.getElementById('menu-screen');
+    
+    if (!podcastsScreen || !menuScreen) {
+        console.error('❌ Elementos da interface não encontrados');
+        return;
+    }
+    
+    // Restaurar HTML original do menu
+    if (originalMenuHTML) {
+        menuScreen.innerHTML = originalMenuHTML;
+    }
+    
+    // Esconder podcasts e mostrar menu
+    podcastsScreen.classList.add('hidden');
+    podcastsScreen.style.display = 'none';
+    
+    menuScreen.classList.remove('hidden');
+    menuScreen.style.display = 'block';
+    
+    console.log('✅ Menu exibido');
+}
+
+// Função para abrir um podcast específico
+async function openPodcast(podcast) {
+    console.log('🎧 Abrindo podcast:', podcast.title);
+    
+    currentPodcast = podcast;
+    
+    const podcastsScreen = document.getElementById('podcasts-screen');
+    const playerScreen = document.getElementById('podcast-player-screen');
+    const podcastTitle = document.getElementById('podcast-title');
+    const audioSource = document.getElementById('podcast-audio-source');
+    const audioPlayer = document.getElementById('podcast-audio');
+    const scriptContainer = document.getElementById('podcast-script-container');
+    
+    if (!podcastsScreen || !playerScreen) {
+        console.error('❌ Elementos da interface não encontrados');
+        return;
+    }
+    
+    // Atualizar título
+    podcastTitle.innerHTML = `<i class="fas fa-podcast"></i> ${podcast.title}`;
+    
+    // Configurar áudio
+    audioSource.src = podcast.audioFile;
+    audioPlayer.load();
+    
+    // Carregar script do podcast
+    try {
+        const response = await fetch(podcast.scriptFile);
+        if (response.ok) {
+            const scriptText = await response.text();
+            // Converter markdown para HTML básico
+            scriptContainer.innerHTML = convertMarkdownToHTML(scriptText);
+        } else {
+            scriptContainer.innerHTML = '<p style="color: #666;">Script not available.</p>';
+        }
+    } catch (error) {
+        console.error('Erro ao carregar script:', error);
+        scriptContainer.innerHTML = '<p style="color: #666;">Error loading script.</p>';
+    }
+    
+    // Esconder lista e mostrar player
+    podcastsScreen.classList.add('hidden');
+    podcastsScreen.style.display = 'none';
+    
+    playerScreen.classList.remove('hidden');
+    playerScreen.style.display = 'block';
+    
+    console.log('✅ Podcast aberto');
+}
+
+// Função para voltar à lista de podcasts
+function backToPodcastsList() {
+    console.log('🔙 Voltando à lista de podcasts...');
+    
+    const playerScreen = document.getElementById('podcast-player-screen');
+    const podcastsScreen = document.getElementById('podcasts-screen');
+    const audioPlayer = document.getElementById('podcast-audio');
+    
+    if (!playerScreen || !podcastsScreen) {
+        console.error('❌ Elementos da interface não encontrados');
+        return;
+    }
+    
+    // Pausar áudio
+    audioPlayer.pause();
+    
+    // Esconder player e mostrar lista
+    playerScreen.classList.add('hidden');
+    playerScreen.style.display = 'none';
+    
+    podcastsScreen.classList.remove('hidden');
+    podcastsScreen.style.display = 'block';
+    
+    console.log('✅ Lista de podcasts exibida');
+}
+
+// Função para fazer download do podcast
+function downloadPodcast() {
+    if (!currentPodcast) {
+        alert('No podcast selected');
+        return;
+    }
+    
+    console.log('💾 Iniciando download do podcast:', currentPodcast.title);
+    
+    const link = document.createElement('a');
+    link.href = currentPodcast.audioFile;
+    link.download = `${currentPodcast.title.replace(/[^a-z0-9]/gi, '_')}.wav`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    console.log('✅ Download iniciado');
+}
+
+// Função auxiliar para converter Markdown básico em HTML
+function convertMarkdownToHTML(markdown) {
+    let html = markdown;
+    
+    // Converter headers
+    html = html.replace(/### (.*?)$/gm, '<h3>$1</h3>');
+    html = html.replace(/## (.*?)$/gm, '<h2>$1</h2>');
+    
+    // Converter negrito
+    html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    
+    // Converter linhas horizontais
+    html = html.replace(/^---$/gm, '<hr>');
+    
+    // Converter quebras de linha duplas em parágrafos
+    const lines = html.split('\n');
+    let inParagraph = false;
+    let result = '';
+    
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i].trim();
+        
+        if (line === '') {
+            if (inParagraph) {
+                result += '</p>';
+                inParagraph = false;
+            }
+        } else if (!line.startsWith('<h') && !line.startsWith('<hr')) {
+            if (!inParagraph) {
+                result += '<p>';
+                inParagraph = true;
+            }
+            result += line + ' ';
+        } else {
+            if (inParagraph) {
+                result += '</p>';
+                inParagraph = false;
+            }
+            result += line;
+        }
+    }
+    
+    if (inParagraph) {
+        result += '</p>';
+    }
+    
+    return result;
+}

@@ -331,6 +331,96 @@
             border-radius: 5px;
         }
 
+        /* Tela de Podcasts */
+        #podcasts-screen,
+        #podcast-player-screen {
+            display: none;
+        }
+
+        #podcasts-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .podcast-card {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 6px;
+            border-left: 5px solid #667eea;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            border: 2px solid #e9ecef;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .podcast-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+        }
+
+        .podcast-card h3 {
+            color: #333;
+            font-size: 1.3em;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .podcast-card p {
+            color: #666;
+            font-size: 0.95em;
+            line-height: 1.6;
+        }
+
+        .audio-player-container {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 6px;
+            margin-bottom: 30px;
+            border: 2px solid #e9ecef;
+        }
+
+        .podcast-script {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 6px;
+            border-left: 5px solid #667eea;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            line-height: 1.8;
+        }
+
+        .podcast-script h2,
+        .podcast-script h3 {
+            color: #333;
+            margin-top: 20px;
+            margin-bottom: 15px;
+        }
+
+        .podcast-script h2 {
+            font-size: 1.8em;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .podcast-script h3 {
+            font-size: 1.4em;
+            color: #667eea;
+        }
+
+        .podcast-script p,
+        .podcast-script strong {
+            color: #555;
+            margin-bottom: 10px;
+        }
+
+        .podcast-script hr {
+            margin: 30px 0;
+            border: none;
+            border-top: 1px solid #ddd;
+        }
+
         @media (max-width: 650px) {
             header h1 {
                 font-size: 1.8em;
@@ -373,6 +463,24 @@
 
             .day-button .day-info {
                 font-size: 0.75em;
+            }
+
+            /* Podcasts responsivo */
+            #podcasts-container {
+                grid-template-columns: 1fr;
+            }
+
+            .podcast-script {
+                padding: 20px;
+                font-size: 0.95em;
+            }
+
+            .podcast-script h2 {
+                font-size: 1.4em;
+            }
+
+            .podcast-script h3 {
+                font-size: 1.2em;
             }
         }
     </style>
@@ -428,9 +536,53 @@
                         <span class="day-info">20 exercises</span>
                     </button>
                     <button class="day-button" onclick="showVideos()" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
-                        <span class="day-name"><i class="fas fa-video"></i> Recorded Classes</span>
-                        <span class="day-info">Watch the lessons</span>
+                        <span class="day-name"><i class="fas fa-video"></i> Week Classes</span>
+                        <span class="day-info">Study the lessons</span>
                     </button>
+                    <button class="day-button" onclick="showPodcasts()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                        <span class="day-name"><i class="fas fa-headphones-alt"></i> Podcasts</span>
+                        <span class="day-info">Practice your listening</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tela de Podcasts Lista -->
+            <div id="podcasts-screen" class="hidden">
+                <div class="exercise-header">
+                    <button class="back-button" onclick="backToMenuFromPodcasts()"><i class="fas fa-arrow-left"></i> Back to Menu</button>
+                    <div class="exercise-counter">
+                        <span><i class="fas fa-podcast"></i> Podcasts</span>
+                    </div>
+                </div>
+
+                <div id="podcasts-container">
+                    <!-- Lista de podcasts será carregada dinamicamente aqui -->
+                </div>
+            </div>
+
+            <!-- Tela de Player de Podcast -->
+            <div id="podcast-player-screen" class="hidden">
+                <div class="exercise-header">
+                    <button class="back-button" onclick="backToPodcastsList()"><i class="fas fa-arrow-left"></i> Back to Podcasts</button>
+                    <div class="exercise-counter">
+                        <span id="podcast-title"><i class="fas fa-podcast"></i> Podcast</span>
+                    </div>
+                </div>
+
+                <!-- Player de Áudio -->
+                <div class="audio-player-container">
+                    <audio id="podcast-audio" controls style="width: 100%; margin-bottom: 20px;">
+                        <source id="podcast-audio-source" src="" type="audio/wav">
+                        Your browser does not support the audio element.
+                    </audio>
+                    <button class="submit-button" onclick="downloadPodcast()" style="margin-top: 0;">
+                        <i class="fas fa-download"></i> Download Podcast
+                    </button>
+                </div>
+
+                <!-- Script do Podcast -->
+                <div id="podcast-script-container" class="podcast-script">
+                    <!-- Script será carregado dinamicamente aqui -->
                 </div>
             </div>
 
