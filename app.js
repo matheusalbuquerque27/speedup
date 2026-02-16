@@ -672,24 +672,40 @@ function backToMenuFromVideos() {
 
 // ===== FUNÇÕES DE PODCASTS =====
 
-// Lista de podcasts disponíveis
-const podcastsList = [
-    {
-        id: 1,
-        title: 'Episode 01 - Travel & Trips',
-        description: 'Listen to Alex and Sam talking about their travel experiences and vacation plans.',
-        audioFile: 'aulas/Root/Podcasts/podcast_episode01.wav',
-        scriptFile: 'aulas/Root/Podcasts/podcast_audioscript.md',
-        duration: '5:00'
-    }
-    // Adicione mais podcasts aqui conforme necessário
-];
+// Lista de podcasts disponíveis por nível
+const podcastsList = {
+    seed: [
+        {
+            id: 1,
+            title: 'Episode 01 - Greetings & Introductions',
+            description: 'Learn basic greetings and how to introduce yourself in English.',
+            audioFile: 'aulas/Seed/Podcasts/podcast_episode01.wav',
+            scriptFile: 'aulas/Seed/Podcasts/podcast_audioscript.md',
+            duration: '5:00',
+            level: 'seed'
+        }
+        // Adicione mais podcasts do Seed aqui
+    ],
+    root: [
+        {
+            id: 1,
+            title: 'Episode 01 - Travel & Trips',
+            description: 'Listen to Alex and Sam talking about their travel experiences and vacation plans.',
+            audioFile: 'aulas/Root/Podcasts/podcast_episode01.wav',
+            scriptFile: 'aulas/Root/Podcasts/podcast_audioscript.md',
+            duration: '5:00',
+            level: 'root'
+        }
+        // Adicione mais podcasts do Root aqui
+    ]
+};
 
 let currentPodcast = null;
 
 // Função para mostrar a lista de podcasts
 function showPodcasts() {
     console.log('🎙️ Abrindo lista de podcasts...');
+    console.log('📊 Nível atual:', currentLevel);
     
     const menuScreen = document.getElementById('menu-screen');
     const podcastsScreen = document.getElementById('podcasts-screen');
@@ -708,20 +724,39 @@ function showPodcasts() {
     // Limpar container
     podcastsContainer.innerHTML = '';
     
-    // Criar cards de podcasts
-    podcastsList.forEach(podcast => {
-        const podcastCard = document.createElement('div');
-        podcastCard.className = 'podcast-card';
-        podcastCard.onclick = () => openPodcast(podcast);
-        podcastCard.innerHTML = `
-            <h3><i class="fas fa-podcast"></i> ${podcast.title}</h3>
-            <p>${podcast.description}</p>
-            <p style="margin-top: 15px; color: #667eea; font-weight: bold;">
-                <i class="fas fa-clock"></i> Duration: ${podcast.duration}
-            </p>
+    // Obter podcasts do nível atual
+    let podcasts = [];
+    
+    if (currentLevel === 'seed') {
+        podcasts = podcastsList.seed || [];
+    } else if (currentLevel === 'root') {
+        podcasts = podcastsList.root || [];
+    }
+    
+    // Verificar se há podcasts disponíveis
+    if (podcasts.length === 0) {
+        podcastsContainer.innerHTML = `
+            <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #666;">
+                <h3><i class="fas fa-podcast"></i> Coming Soon!</h3>
+                <p>Podcasts for the ${currentLevel.toUpperCase()} level will be available soon.</p>
+            </div>
         `;
-        podcastsContainer.appendChild(podcastCard);
-    });
+    } else {
+        // Criar cards de podcasts
+        podcasts.forEach(podcast => {
+            const podcastCard = document.createElement('div');
+            podcastCard.className = 'podcast-card';
+            podcastCard.onclick = () => openPodcast(podcast);
+            podcastCard.innerHTML = `
+                <h3><i class="fas fa-podcast"></i> ${podcast.title}</h3>
+                <p>${podcast.description}</p>
+                <p style="margin-top: 15px; color: #667eea; font-weight: bold;">
+                    <i class="fas fa-clock"></i> Duration: ${podcast.duration}
+                </p>
+            `;
+            podcastsContainer.appendChild(podcastCard);
+        });
+    }
     
     // Esconder menu e mostrar podcasts
     menuScreen.classList.add('hidden');
@@ -730,7 +765,7 @@ function showPodcasts() {
     podcastsScreen.classList.remove('hidden');
     podcastsScreen.style.display = 'block';
     
-    console.log('✅ Lista de podcasts exibida');
+    console.log(`✅ Lista de podcasts exibida para nível: ${currentLevel}`);
 }
 
 // Função para voltar ao menu a partir da lista de podcasts

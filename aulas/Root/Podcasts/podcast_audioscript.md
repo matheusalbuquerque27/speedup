@@ -1,6 +1,6 @@
 ## Script
 
-### Opening (30 seconds)
+### Opening
 
 **Alex:** Hi everyone! Welcome to English Conversations. I'm Alex.
 
@@ -14,7 +14,7 @@
 
 ---
 
-### Main Conversation Part 1: Last Trip (2 minutes)
+### Main Conversation Part 1: Last Trip
 
 **Alex:** Sam, where did you go on your last vacation?
 
@@ -42,8 +42,7 @@
 
 ---
 
-### Main Conversation Part 2: Transportation & Plans (1 minute 30 seconds)
-
+### Main Conversation Part 2: Transportation & Plans
 **Alex:** Great! Now, let me tell you about my trip. Last month, I went to São Paulo.
 
 **Sam:** Oh, interesting! How did you travel? By plane or by bus?
@@ -66,7 +65,7 @@
 
 ---
 
-### Closing (1 minute)
+### Closing
 
 **Alex:** Thank you, Sam! Now, let's ask our listeners: Where did YOU go on your last trip?
 
